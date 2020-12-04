@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!--  -->
+    <form action="\home\publish" method="post">
+        <div name="author">
+            作者：
+            <%= user %>
+        </div>
+        <p>文章标题: <input type="text" name="title" placehoder="title"  style="width: 500px;"/></p>
+        <p>文章内容: <input type="text" name="content" style="height: 500px; width: 500px;"/></p>
+        <input type="submit" value="Submit" style="margin: 20px 300px"/>
+    </form>
+
+</body>
+</html>

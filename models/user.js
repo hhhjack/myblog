@@ -1,8 +1,8 @@
 let mongoose = require('mongoose');
-// mongoose.connect("mongodb://127.0.0.1/mongoose_test");
+// var bcrypt = require('bcrypt-nodejs');
 
-let userSchema = new Schema({
-    name: {
+let userSchema = mongoose.Schema({
+    username: {
         type: String,
         unique: true,
         required: true
@@ -18,8 +18,17 @@ let userSchema = new Schema({
     photo: {
         filename: String,
         base64: String,
-        default: 'img/nophoto.jpg'
+        // default: 'img/nophoto.jpg'
     }
 });
+
+// userchema.methods.encryptPassword = function(password){
+//     return bcrypt.hashSync(password,bcrypt.genSaltSync(5),null);
+// };
+
+
+// userchema.methods.validPassword = function(password){
+//     return bcrypt.compareSync(password,this.password);
+// };
 
 module.exports = mongoose.model('User', userSchema);

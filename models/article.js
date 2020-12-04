@@ -7,13 +7,13 @@ let articleSchema = mongoose.Schema({
   },
   author: {
     type: String,
-    required: true
+    // required: true
   },
   time:{
     type: Date,
     default: Date.now()
   },
-  body: {
+  content: {
     type: String,
     required: true
   },
@@ -26,7 +26,7 @@ let articleSchema = mongoose.Schema({
           user: String,
           message: String,
           comTime: {
-              type: Data,
+              type: Date,
               default: Date.now()
           }
       }
