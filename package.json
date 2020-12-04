@@ -1,0 +1,28 @@
+{
+  "name": "myblog",
+  "version": "1.0.0",
+  "description": "nodejs+express+mongodb",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hhhjack/myblog.git"
+  },
+  "author": "zxy",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hhhjack/myblog/issues"
+  },
+  "homepage": "https://github.com/hhhjack/myblog#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "ejs": "^3.1.5",
+    "express": "^4.17.1",
+    "mongoose": "^5.11.2",
+    "passport": "^0.4.1",
+    "passport-local": "^1.0.0"
+  }
+}
