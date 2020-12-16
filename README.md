@@ -36,13 +36,199 @@ nodejs+express+mongodb
 ### res & req
 
 - 在html的表单属性中会指明用哪种方法发送请求<form method=' '，可能是get也可能是post
-
 - 博客内容通过post方法提交
-
 - 查询时的字段通过get方法提交
-
 - req.query: 处理get请求，获取get请求参数。
-
 - req.body: 处理post请求
-
 - req.params: 处理形如/:xxx形式的get或者post请求
+
+
+
+
+# API 文档
+
+## 注册
+
+- url: http://127.0.0.1/api/reg
+- method: post
+- {
+    username: '',
+    email: '',
+    password: ''
+}
+- 返回值：code
+    - 0: username为空
+    - 1：email为空
+    - 2：password为空
+- 3：数据库发生错误
+    - 500：用户名已存在
+    - 200：注册成功
+
+
+
+## 上传头像
+
+- url: http://127.0.0.1/api/upload
+- method: post
+- {
+   photofile: 
+  }
+- 返回值：
+  - 0：上传失败
+  - 1：写入失败
+  - 200：上传成功
+
+
+
+
+## 登陆
+
+- url: http://127.0.0.1/api/login
+- method: post
+- {
+    username: '',
+    password: ''
+}
+- 返回值
+    - 0：用户不存在
+    - 1：密码错误
+    - 200： 登陆成功
+
+
+
+## 获取头像
+
+- url: http://127.0.0.1/api/login/:username
+- method: get
+- 
+
+
+
+## 分页查询
+
+- url: http://127.0.0.1/api/home/pagelist
+
+- method: post
+
+- {
+
+  ​	page: '',
+
+  ​	rows: ''
+
+  }
+
+- 返回值
+
+  - 0：已经到最后一个页面
+
+  - 200：
+
+    {
+        time: 2020-12-04T12:10:35.234Z,
+        _id: 5fca27cff732d76348dd8dab,
+        title: '1241' ,
+
+    ​	author: '123'
+
+     },
+
+    page: ''
+
+
+
+## 发布文章
+
+- url:  http://127.0.0.1/api/home/publish/:username
+
+- method: post
+
+- {
+
+  ​	title: "",
+
+  ​	content: ""
+
+  }
+
+- 返回值：
+
+  - 0：文章名不能为空
+  - 1：内容不能为空
+  - 2： 数据库发生错误
+  - 200： success
+
+
+
+## 查询文章详情
+
+- url: http://127.0.0.1/api/home/detail/:id
+
+- method: get
+
+- 返回值：
+
+  - 0： 未找到该文章
+
+  - 200： success
+
+    {
+
+    ​	time: 2020-12-10T08:43:04.370Z,
+      _id: 5fd1df989d0c2929cc71c02f,
+      title: '关于疫情的感悟',
+      author: '123',
+      content: '饿啊温热威锋网',
+      comments: []
+
+    }
+
+
+
+## 删除文章
+
+- url: http://127.0.0.1/api/home/del/:id
+- method: get
+- 返回值：
+  - 0: 删除失败
+  - 200：删除成功
+
+
+
+## 修改文章
+
+- url: http://127.0.0.1/api/home/edit/:id
+
+- method: post
+
+- {
+
+  ​	title: '',
+
+  ​	content: ''
+
+  }
+
+- 返回值：
+
+  - 0: 修改失败
+  - 200：修改成功
+
+
+
+## 添加评论
+
+- url: http://127.0.0.1/api/home/comment/:id/:username
+
+- method: post
+
+- {
+
+  ​	message: ''
+
+  }
+
+- 返回值：
+
+  - 0: 修改失败
+  - 200：修改成功

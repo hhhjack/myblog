@@ -1,5 +1,4 @@
 let mongoose = require('mongoose');
-// var bcrypt = require('bcrypt-nodejs');
 
 let userSchema = mongoose.Schema({
     username: {
@@ -16,19 +15,9 @@ let userSchema = mongoose.Schema({
         required: true
     },
     photo: {
-        filename: String,
-        base64: String,
-        // default: 'img/nophoto.jpg'
+        type: String,
+        default: 'none'
     }
 });
-
-// userchema.methods.encryptPassword = function(password){
-//     return bcrypt.hashSync(password,bcrypt.genSaltSync(5),null);
-// };
-
-
-// userchema.methods.validPassword = function(password){
-//     return bcrypt.compareSync(password,this.password);
-// };
 
 module.exports = mongoose.model('User', userSchema);

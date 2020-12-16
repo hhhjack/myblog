@@ -1,17 +1,22 @@
 let mongoose = require('mongoose');
 
+let time = function(date){
+    let s = date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+    return s;
+}
+
 let articleSchema = mongoose.Schema({
   title: {
     type: String,
     required: true
   },
   author: {
-    type: String,
+    type: String
     // required: true
   },
   time:{
-    type: Date,
-    default: Date.now()
+    type: String,
+    default: time(new Date())
   },
   content: {
     type: String,
@@ -26,8 +31,8 @@ let articleSchema = mongoose.Schema({
           user: String,
           message: String,
           comTime: {
-              type: Date,
-              default: Date.now()
+              type: String,
+              default: time(new Date())
           }
       }
   ]
