@@ -1,11 +1,11 @@
 const express = require('express');
 const { check, validationResult } = require('express-validator');
-// const bcrypt = require('bcrypt');
-// const passport = require('passport');
 const fs = require('fs');
 const multer = require('multer');
 const path = require('path');
 const axios = require('axios');
+const jwt = require('jsonwebtoken');
+const {createToken, checkToken} = require('./../token')
 
 let User = require('../models/user');
 
@@ -42,19 +42,20 @@ router.post('/upload/:username', upload.single('test'),function (req, res){
     })
 })
 
+router.get('/reg',function (req, res){
+    res.send("hello")
+})
+
 router.post('/reg', [
-    // check('name').isLength({ min: 1 }).withMessage('Name is required'),
     check('username').isLength({ min: 1 }).withMessage('Username is required'),
     check('email').isLength({ min: 1 }).withMessage('Email is required'),
-    // check('email').isEmail().withMessage('invalid email'),
     check("password", "invalid password")
       .isLength({ min: 1 })
       .custom((value,{req, loc, path}) => {
         return value;
       })
 ],function (req, res){
-
-    // console.log(req.body);
+    console.log("test", req.body);
     User.findOne({
         username: req.body.username
     }, (err, data) => {
@@ -101,21 +102,12 @@ router.post('/reg', [
 
 });
 
-// 登陆
-// axios.get('/url', {
-//     responseType: 'arraybuffer'
-//     }).then(response => {
-//     return 'data:image/png;base64,' + btoa(
-//     new Uint8Array(response.data).reduce((data, byte) => data + String.fromCharCode(byte), '')
-//     )
-//     }).then(data => {
-//     this.img = data
-//     });
-
+//getphoto
 router.get('/login/:username', function (req, res,){
+    // console.log('headers ', req.headers);
     User.findOne({username: req.params.username}, function(err, data){
         if(err || data.photo=="none"){
-            res.json({code: 0});
+            res.sendFile('E:/for_work_study/my-program/myblog/uploads/nophoto.jpg');
         }else{
             res.sendFile('E:/for_work_study/my-program/myblog/uploads/'+data.photo);
             // console.log('getphoto ', data);
@@ -123,6 +115,7 @@ router.get('/login/:username', function (req, res,){
     })
 });
 
+// login
 router.post('/login', function (req, res){
     User.findOne({
         username: req.body.username
@@ -136,8 +129,17 @@ router.post('/login', function (req, res){
                 res.json({code: 0});
             }else{ 
                 if(data.password === req.body.password){
+                    const token = createToken({
+                        id: data._id,
+                        name: data.username
+                    });
                     console.log('登陆成功');
-                    res.json({code: 200});
+                    res.json({
+                        code: 200,
+                        data:{
+                            token: token
+                        }
+                    });
                 }else{
                     res.json({code: 1});
                 }

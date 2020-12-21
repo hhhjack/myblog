@@ -1,17 +1,16 @@
 var express = require('express');
 const mongoose = require('mongoose');
 const { check, validationResult } = require('express-validator');
+const {createToken, checkToken} = require('./../token')
 
 let Article = require('../models/article');
 
 var router = express.Router();
 
 //分页查询
-router.get('/pagelist',function(req,res){
-    res.render("../test")
-})
-
 router.post('/pagelist',function(req,res){
+
+    // console.log('headers ', req.headers)
 
     let page=req.body.page;
     let rows=req.body.rows;
@@ -37,68 +36,65 @@ router.post('/pagelist',function(req,res){
 });
 
 //发布文章
-router.get('/publish', function (req, res, next){
-    res.render("../test")
-});
-
-router.post('/publish/:username', [
+router.post('/publish', [
     check('title').isLength({ min: 1 }).withMessage('Username is required'),
     check('content').isLength({ min: 1 }).withMessage('Email is required'),
 ], function (req, res, next){
 
-    const errors = validationResult(req);
+    // console.log('pulish header ', req.headers.authorization);
 
-    if(!errors.isEmpty()){
-        console.log("err ", errors);
-        // console.log('publish ', req.body);
-        if(errors.errors[0].param == 'title'){
-            res.json({code: 0});
-        }else{
-            res.json({code: 1});
-        }
-    }else{
-
-        // 为了更好的显示时间，直接更改时间显示方式，改为字符串
-        let date = new Date();
-        let s = date.getFullYear()+"-";
-        if(date.getMonth()<9)
-            s += '0';
-        s+= (date.getMonth()+1) + "-";
-        if(date.getDate()<10)
-            s += '0';
-        s += date.getDate() + " ";
-        if(date.getHours()<10)
-            s += '0';
-        s += date.getHours() + ":";
-        if(date.getMinutes()<10)
-            s += '0';
-        s += date.getMinutes() + ":";
-        if(date.getSeconds()<10)
-            s += '0';
-        s += date.getSeconds();
-        console.log('publish time', s);
-        
-        let art = new Article(
-            {
-                title: req.body.title,
-                author: req.params.username,
-                time: s,
-                content: req.body.content,
-            }
-        );
-        console.log("test publish",s);
-        art.save(function (err){
-            if(err){
-                // res.send('很抱歉，数据库发生错误');
-                res.json({code: 2, err});
-                return;
+    checkToken(req.headers.authorization).then(respond=>{
+        //token验证成功
+        //判断过期时间
+        // console.log('checktoken ', respond);
+        const errors = validationResult(req);
+        if(!errors.isEmpty()){
+            // console.log("err ", errors);
+            if(errors.errors[0].param == 'title'){
+                res.json({code: 0});
             }else{
-                console.log('article save success!');
-                console.log(art);
-                res.json({code: 200});
+                res.json({code: 1});
             }
-        });
-    }
+        }else{
+            // 为了更好的显示时间，直接更改时间显示方式，改为字符串
+            let date = new Date();
+            let s = date.getFullYear()+"-";
+            if(date.getMonth()<9)
+                s += '0';
+            s+= (date.getMonth()+1) + "-";
+            if(date.getDate()<10)
+                s += '0';
+            s += date.getDate() + " ";
+            if(date.getHours()<10)
+                s += '0';
+            s += date.getHours() + ":";
+            if(date.getMinutes()<10)
+                s += '0';
+            s += date.getMinutes() + ":";
+            if(date.getSeconds()<10)
+                s += '0';
+            s += date.getSeconds();
+            
+            let art = new Article(
+                {
+                    title: req.body.title,
+                    author: req.body.username,
+                    time: s,
+                    content: req.body.content,
+                }
+            );
+            art.save(function (err){
+                if(err){
+                    res.json({code: 2, err});
+                }else{
+                    res.json({code: 200});
+                }
+            });
+        }
+    }).catch(err=>{
+        res.json({code: 3});
+    })
+
 });
 
 //文章详情页
@@ -118,31 +114,69 @@ router.get('/detail/:id', function(req, res){
 
 // 文章删除
 router.get('/del/:id', function(req, res){
-    Article.findByIdAndUpdate(req.params.id, { $set: { isDel: '1' }}, (err, data)=>{
-        // console.log('del success!');
-        if(!err){
-            res.json({code: 200});
-        }else{
-            res.json({code: 0})
-        }
-    });
+
+    checkToken(req.headers.authorization).then(respond=>{
+        Article.findById(req.params.id, function(err, data){
+            if(err){
+                res.json({code: 0});
+            }else{
+                console.log('data ', data);
+                if(data.author == respond.name){
+                    Article.update({_id: req.params.id}, { $set: { isDel: '1' }}, (err, data)=>{
+                        if(!err){
+                            res.json({code: 200});
+                        }else{
+                            res.json({code: 1})
+                        }
+                    });
+                }else{
+                    res.json({code: 2});
+                }
+            }
+        })
+        
+    }).catch(err=>{
+        res.json({code: 3})
+    })
+
 })
 
 // 文章修改
-router.post('/edit/:id', function(req, res){
+router.post('/edit', function(req, res){
     // console.log("edit: ", req.body);
-    Article.findByIdAndUpdate(req.params.id, { $set: { title: req.body.title, content: req.body.content }}, (err, data)=>{
-        if(!err){
-            res.json({code: 200});
-        }else{
-            // console.log("edit ", data);
-            res.json({code: 0})
-        }
-    });
+    console.log('token ', req.headers.authorization);
+
+    checkToken(req.headers.authorization).then(respond=>{
+        //token验证成功
+        //判断过期时间
+        Article.findById(req.body.id, function(err, data){
+            if(err){
+                res.json({code: 0});
+            }else{
+                console.log('data ', data);
+                if(data.author == respond.name){
+                    Article.update({_id: req.body.id}, { $set: { title: req.body.title, content: req.body.content }}, (err, data)=>{
+                        if(!err){
+                            res.json({code: 200});
+                        }else{
+                            // console.log("edit ", data);
+                            // console.log('err ', err);
+                            res.json({code: 1})
+                        }
+                    });
+                }else{
+                    res.json({code: 2});
+                }
+            }
+        })
+        
+    }).catch(err=>{
+        res.json({code: 3})
+    })
 })
 
 //添加评论
-router.post('/comment/:id/:username', function(req, res){
+router.post('/comment', function(req, res){
     let date = new Date();
     let s = date.getFullYear()+"-";
     if(date.getMonth()<9)
@@ -163,12 +197,12 @@ router.post('/comment/:id/:username', function(req, res){
     console.log('comment time', s);
 
     let addComment = {
-        user: req.params.username,
+        user: req.body.username,
         message: req.body.message,
         comTime: s
     }
     console.log('comment data ', addComment);
-    Article.findByIdAndUpdate(req.params.id, { $push: { comments: addComment }}, (err)=>{
+    Article.findByIdAndUpdate(req.body.id, { $push: { comments: addComment }}, (err)=>{
         if(!err){
             res.json({code: 200});
         }else{
@@ -176,7 +210,5 @@ router.post('/comment/:id/:username', function(req, res){
         }
     });
 });
-
-
 
 module.exports = router;

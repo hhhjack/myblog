@@ -3,11 +3,8 @@ const path = require('path');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-// const settings = require('./settings');
-// const session = require('express-session');
-// const flash = require('connect-flash');
-// var validator = require('express-validator');
-// const passport = require('passport');
+const expressJwt = require('express-jwt');
+const jwt = require('jsonwebtoken');
 
 // 连接数据库
 mongoose.connect("mongodb://127.0.0.1/myblog");
@@ -25,11 +22,11 @@ var app = express();
 
 app.use(cookieParser());
 
-// app.use(bodyParser.json());
-// app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use(bodyParser.json({limit:'100mb'}));
-app.use(bodyParser.urlencoded({ limit:'100mb', extended: true ,parameterLimit: 1000000}));
+// app.use(bodyParser.json({limit:'100mb'}));
+// app.use(bodyParser.urlencoded({ limit:'100mb', extended: true ,parameterLimit: 1000000}));
 
 var articleRouter = require('./routes/articles');
 var userRouter = require('./routes/users');
